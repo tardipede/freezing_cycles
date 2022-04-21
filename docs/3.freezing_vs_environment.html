@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Matteo Vecchi" />
+
+<meta name="date" content="2022-04-21" />
+
+<title>3. Freezing cycles tolerance vs. environmental variables</title>
+
+<script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">freezing_tardigrades</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">3. Freezing cycles tolerance
+vs. environmental variables</h1>
+<h4 class="author">Matteo Vecchi</h4>
+<h4 class="date">2022-04-21</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-04-21
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>freezing_cycles/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220415code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20220415)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20220415code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20220415)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestree3526b930fdaecd58660aa6294121e141f7be1c67targetblank3526b93a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/tardipede/freezing_cycles/tree/3526b930fdaecd58660aa6294121e141f7be1c67" target="_blank">3526b93</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestree3526b930fdaecd58660aa6294121e141f7be1c67targetblank3526b93a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/tardipede/freezing_cycles/tree/3526b930fdaecd58660aa6294121e141f7be1c67" target="_blank">3526b93</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+
+Untracked files:
+    Untracked:  .gitignore
+    Untracked:  output/M_vs_plong_plot.svg
+    Untracked:  output/tree_Cycles.svg
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>points = data.frame(read_xlsx(&quot;./data/data_freezing.xlsx&quot;, sheet = &quot;species_data&quot;))[,1:3]</code></pre>
+<pre class="r"><code># The 30&#39; resolution BIoclims rasters are heavy, so I load the point data extracted previously.
+#If you want to do it by yourself put the bioclim rasters 1:11 in a folder in the data folder and run the following code
+#bioclim_stack = stack(list.files(&quot;./data/bioclim/&quot;, full.names = TRUE))
+#bioclims_extracted = data.frame(raster::extract(bioclim_stack, points[,3:2]))
+
+bioclims_extracted = read.table(&quot;./data/bioclim_data.txt&quot;, header=T)
+pca_bioclims = prcomp(bioclims_extracted, scale=T)</code></pre>
+<pre class="r"><code># function to permute the dataset
+data_permute = function(x){
+  for (i in 1:ncol(x)){
+    x[,i]=base::sample(x[,i],size=length(x[,i]),replace=F)}
+  return(x)
+}
+
+# Create a set of 1000 null  PCAs
+pca_nulls = list()
+for (i in 1:1000){
+  pca_nulls[[i]] = prcomp(data_permute(bioclims_extracted),scale.=T,center=T)
+}
+
+
+# Get null distribution of explained variance
+eig_nulls = lapply(pca_nulls, function(x){(x$sdev)^2/sum((x$sdev)^2)})
+eig_nulls = data.frame(do.call(rbind,eig_nulls))
+colnames(eig_nulls) = c(&quot;PC1&quot;,&quot;PC2&quot;,&quot;PC3&quot;,&quot;PC4&quot;)
+# Explained variance on observed data
+eig_obs = (pca_bioclims$sdev)^2/sum((pca_bioclims$sdev)^2)
+
+# Calculate explained variance p-values
+eig_pvals = c()
+for (i in 1:length(eig_obs)){
+  eig_pvals[i] = mean(eig_obs[i] &lt; eig_nulls[,i])
+}
+names(eig_pvals) = paste0(&quot;PC&quot;,1:11)
+eig_pvals</code></pre>
+<pre><code> PC1  PC2  PC3  PC4  PC5  PC6  PC7  PC8  PC9 PC10 PC11 
+   0    0    1    1    1    1    1    1    1    1    1 </code></pre>
+<pre class="r"><code># Create a function to calculate the ILs of the components loadings
+IL = function(x, component){
+  eig = (x$sdev^2)[component]
+  ILs = (x$rotation[,component]^2)*eig^2 
+  return(ILs)
+}
+
+# PC1
+IL_observed_PC1 = IL(pca_bioclims,1)
+IL_nulls_PC1 = data.frame(do.call(rbind,lapply(pca_nulls,IL, component=1)))
+
+# Calculate PC1 IL p-values
+IL_PC1_pvals = c()
+for (i in 1:length(IL_observed_PC1)){
+  IL_PC1_pvals[i] = mean(IL_observed_PC1[i] &lt; IL_nulls_PC1[,i])
+}
+names(IL_PC1_pvals) = colnames(IL_nulls_PC1) 
+
+# PC2
+IL_observed_PC2 = IL(pca_bioclims,2)
+IL_nulls_PC2 = data.frame(do.call(rbind,lapply(pca_nulls,IL, component=2)))
+
+# Calculate PC2 IL p-values
+IL_PC2_pvals = c()
+for (i in 1:length(IL_observed_PC2)){
+  IL_PC2_pvals[i] = mean(IL_observed_PC2[i] &lt; IL_nulls_PC2[,i])
+}
+names(IL_PC2_pvals) = colnames(IL_nulls_PC2) 
+
+
+# Create a simplified PC1 (sPC1)
+simplified_loadings_PC1 = pca_bioclims$rotation[,1] * (IL_PC1_pvals&lt;0.05)
+sPC1 = as.matrix(scale(bioclims_extracted)) %*% as.matrix(simplified_loadings_PC1)
+
+# Create a simplified PC2 (sPC2)
+simplified_loadings_PC2 = pca_bioclims$rotation[,2] * (IL_PC2_pvals&lt;0.05)
+sPC2 = as.matrix(scale(bioclims_extracted)) %*% as.matrix(simplified_loadings_PC2)
+
+# test if PC1 and sPC1 are correlated
+plot(pca_bioclims$x[,1],sPC1, xlab=&quot;sPC1&quot;, ylab=&quot;PC1&quot;)
+abline(lm(sPC1~pca_bioclims$x[,1]))</code></pre>
+<p><img src="figure/3.freezing_vs_environment.Rmd/simplify%20PCA-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>cor.test(sPC1,pca_bioclims$x[,1]) </code></pre>
+<pre><code>
+    Pearson&#39;s product-moment correlation
+
+data:  sPC1 and pca_bioclims$x[, 1]
+t = 47.846, df = 10, p-value = 3.837e-13
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.9919822 0.9994102
+sample estimates:
+     cor 
+0.997823 </code></pre>
+<pre class="r"><code># test if PC2 and sPC2 are correlated
+plot(pca_bioclims$x[,2],sPC2, xlab=&quot;sPC2&quot;, ylab=&quot;PC2&quot;)
+abline(lm(sPC2~pca_bioclims$x[,2]))</code></pre>
+<p><img src="figure/3.freezing_vs_environment.Rmd/simplify%20PCA-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>cor.test(sPC2,pca_bioclims$x[,2])</code></pre>
+<pre><code>
+    Pearson&#39;s product-moment correlation
+
+data:  sPC2 and pca_bioclims$x[, 2]
+t = 7.9366, df = 10, p-value = 1.262e-05
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.7605581 0.9802605
+sample estimates:
+      cor 
+0.9289754 </code></pre>
+<pre class="r"><code>#Calculate the new eigenvalue for sPC
+tot.var = sum(pca_bioclims$sdev^2)
+sPC1var = var(sPC1)
+sPC1.expvar = sPC1var/tot.var
+
+#Calculate the new eigenvalue for sPC2
+sPC2var = var(sPC2)
+sPC2.expvar = sPC2var/tot.var
+
+# Create new PCs data frame
+sPCs = data.frame(species_code = points$species_code,
+                  sPC1 = sPC1,
+                  sPC2 = sPC2)
+
+# create loadings dataframe
+sloadings = data.frame(bioclim  = names(simplified_loadings_PC1),
+                       sPC1 = simplified_loadings_PC1,
+                       sPC2 = simplified_loadings_PC2)</code></pre>
+<pre class="r"><code>data_merged = merge(read.table(&quot;./output/means_cycles.txt&quot;, header=T),sPCs)
+data_merged$scaled_M = as.numeric(scale(data_merged$M))</code></pre>
+<pre class="r"><code>tree = chronos(read.nexus(&quot;./data/tree.nex&quot;))</code></pre>
+<pre><code>
+Setting initial dates...
+Fitting in progress... get a first set of estimates
+         (Penalised) log-lik = -25.15977 
+Optimising rates... dates... -25.15977 
+Optimising rates... dates... -25.15977 
+
+log-Lik = -24.98872 
+PHIIC = 108.23 </code></pre>
+<pre class="r"><code>tree = drop.tip(tree, tip = tree$tip.label[!(tree$tip.label %in% data_merged$species)])
+class(tree) = &quot;phylo&quot;
+
+data_merged = data_merged[data_merged$species %in% tree$tip.label,]</code></pre>
+<pre class="r"><code>phylo.matrix = vcv.phylo(tree)
+inv.phylo.matrix = solve(phylo.matrix)
+
+data_merged = data_merged[match(rownames(inv.phylo.matrix),data_merged$species),]
+
+data.jags = list(M = data_merged$scaled_M,
+                 sPC1 = as.numeric(scale(data_merged$sPC1)),
+                 sPC2 = as.numeric(scale(data_merged$sPC2)),
+                 inv.phylo.matix = inv.phylo.matrix,
+                 nsp = nrow(inv.phylo.matrix),
+                 zeros = rep(0, nrow(inv.phylo.matrix)))
+
+# The model includes some truncated priors. As it is not possible to do it by specifying the modell as function in R, the moded is loaded as txt file.
+
+parameters.jags = c(&quot;alpha&quot;,&quot;beta_spc1&quot;,&quot;beta_spc2&quot;,&quot;sigma.phylo&quot;,&quot;sigma.res&quot;)
+
+
+ifelse(&quot;mod.env.rds&quot; %in% list.files(&quot;./output&quot;),{fit.env = readRDS(&quot;./output/mod.env.rds&quot;)},{
+
+  fit.env = jags(data = data.jags,
+               parameters.to.save = parameters.jags,
+               model.file = &quot;./code/model.txt&quot;,
+               n.chains = 3, n.iter = 1000000)
+write_rds(fit.env, file=&quot;./output/mod.env.rds&quot;)
+  
+})</code></pre>
+<pre><code>[[1]]
+JAGS model:
+
+
+model {
+    # PRIORS
+    alpha ~ dunif(-100, 100)
+    beta_spc1 ~ dunif(-100, 100)
+    beta_spc2 ~ dunif(-100, 100)
+    sigma.phylo ~ dnorm(0,100)T(0,)
+    tau.phylo &lt;- 1/(sigma.phylo^2)
+    sigma.res ~ dnorm(0,100)T(0,)
+    tau.res &lt;- 1/(sigma.res^2)
+
+    # Likelihood
+    error.phylo[1:nsp] ~ dmnorm(zeros[], tau.phylo * inv.phylo.matix[,])
+
+    for(i in 1:nsp){
+        mu.M[i] &lt;- alpha +
+          beta_spc1 * sPC1[i] +
+          beta_spc2 * sPC2[i] +
+          error.phylo[i]
+        M[i] ~ dnorm(mu.M[i], tau.res)
+    }
+
+} # end model
+Fully observed variables:
+ M inv.phylo.matix nsp sPC1 sPC2 zeros </code></pre>
+<pre class="r"><code>chains = data.frame(do.call(rbind,as.mcmc(fit.env)))
+
+p_dir = p_direction(chains[,1:3])
+p_vals = pd_to_p(p_dir$pd)
+names(p_vals) = p_dir$Parameter
+p_vals</code></pre>
+<pre><code>    alpha beta_spc1 beta_spc2 
+0.7786667 0.3553333 0.0060000 </code></pre>
+<pre class="r"><code>chains_to_plot = gather(chains[,c(2:3)],&quot;variable&quot;,&quot;value&quot;)
+chains_to_plot$variable = factor(chains_to_plot$variable, levels = c(&quot;beta_spc2&quot;,&quot;beta_spc1&quot;))
+
+medians = aggregate(chains_to_plot$value, by=list(chains_to_plot$variable), FUN = median)
+
+plot1 = ggplot(chains_to_plot )+
+  theme_bw()+
+  geom_hline(yintercept = 0, col=&quot;red&quot;)+
+  geom_violin(aes(x=variable, y=value), alpha=0.5, show.legend=T, color=&quot;NA&quot;, fill=&quot;lightblue&quot;)+
+  #scale_fill_viridis_c()+
+  stat_summary(aes(x=variable, y=value),fun=median, colour=&quot;black&quot;, geom=&quot;point&quot;, size = 3)+
+  stat_summary(aes(x=variable, y=value),fun.data=median_hilow, colour=&quot;black&quot;, geom=&quot;linerange&quot;)+
+  geom_text(data= medians,aes(x=(1:2)+0.1, y=medians[,2], label = paste0(&quot;p = &quot;,round(p_vals[3:2],4))))+
+  xlab(&quot;&quot;)+ylab(&quot;&quot;)+coord_flip()+
+  theme(panel.grid.major.y = element_blank(), panel.grid.minor = element_blank(),panel.border =    element_blank())
+
+
+
+plot2 = ggplot(sloadings)+
+        theme_bw()+
+         geom_hline(yintercept = 0, col=&quot;black&quot;)+
+        geom_bar(stat=&quot;identity&quot;, aes(x=bioclim, y=sPC1))+
+  xlab(&quot;&quot;)+ylab(&quot;Contribution to sPC1&quot;)+
+  theme(panel.grid.major.y = element_blank(), panel.grid.minor = element_blank(),panel.border =    element_blank())+
+  scale_x_discrete(label = paste0(&quot;Bioc&quot;,1:11))
+
+plot3 = ggplot(sloadings)+
+        theme_bw()+
+        geom_hline(yintercept = 0, col=&quot;black&quot;)+
+        geom_bar(stat=&quot;identity&quot;, aes(x=bioclim, y=sPC2))+
+  xlab(&quot;&quot;)+ylab(&quot;Contribution to sPC2&quot;)+
+  theme(panel.grid.major.y = element_blank(), panel.grid.minor = element_blank(),panel.border =    element_blank())+
+  scale_x_discrete(label = paste0(&quot;Bioc&quot;,1:11))
+
+plot1|(plot2/plot3)</code></pre>
+<p><img src="figure/3.freezing_vs_environment.Rmd/plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div id="refs">
+
+</div>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.1.3 (2022-03-10)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur/Monterey 10.16
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] patchwork_1.1.1   R2jags_0.7-1      rjags_4-12        coda_0.19-4      
+ [5] bayestestR_0.11.5 ape_5.6-2         rgdal_1.5-30      readxl_1.4.0     
+ [9] raster_3.5-15     sp_1.4-6          forcats_0.5.1     stringr_1.4.0    
+[13] dplyr_1.0.8       purrr_0.3.4       readr_2.1.2       tidyr_1.2.0      
+[17] tibble_3.1.6      ggplot2_3.3.5     tidyverse_1.3.1  
+
+loaded via a namespace (and not attached):
+ [1] nlme_3.1-155        fs_1.5.2            lubridate_1.8.0    
+ [4] RColorBrewer_1.1-3  insight_0.17.0      httr_1.4.2         
+ [7] rprojroot_2.0.3     tools_4.1.3         backports_1.4.1    
+[10] bslib_0.3.1         utf8_1.2.2          R6_2.5.1           
+[13] R2WinBUGS_2.1-21    rpart_4.1.16        Hmisc_4.6-0        
+[16] DBI_1.1.2           colorspace_2.0-3    nnet_7.3-17        
+[19] withr_2.5.0         gridExtra_2.3       tidyselect_1.1.2   
+[22] compiler_4.1.3      git2r_0.30.1        cli_3.2.0          
+[25] rvest_1.0.2         htmlTable_2.4.0     xml2_1.3.3         
+[28] labeling_0.4.2      sass_0.4.1          checkmate_2.0.0    
+[31] scales_1.2.0        digest_0.6.29       foreign_0.8-82     
+[34] rmarkdown_2.13      jpeg_0.1-9          base64enc_0.1-3    
+[37] pkgconfig_2.0.3     htmltools_0.5.2     dbplyr_2.1.1       
+[40] fastmap_1.1.0       highr_0.9           htmlwidgets_1.5.4  
+[43] rlang_1.0.2         rstudioapi_0.13     farver_2.1.0       
+[46] jquerylib_0.1.4     generics_0.1.2      jsonlite_1.8.0     
+[49] magrittr_2.0.3      Formula_1.2-4       Matrix_1.4-0       
+[52] Rcpp_1.0.8.3        munsell_0.5.0       fansi_1.0.3        
+[55] abind_1.4-5         lifecycle_1.0.1     terra_1.5-21       
+[58] stringi_1.7.6       yaml_2.3.5          grid_4.1.3         
+[61] parallel_4.1.3      promises_1.2.0.1    crayon_1.5.1       
+[64] lattice_0.20-45     splines_4.1.3       haven_2.4.3        
+[67] hms_1.1.1           knitr_1.38          pillar_1.7.0       
+[70] boot_1.3-28         codetools_0.2-18    reprex_2.0.1       
+[73] glue_1.6.2          evaluate_0.15       latticeExtra_0.6-29
+[76] data.table_1.14.2   modelr_0.1.8        png_0.1-7          
+[79] vctrs_0.4.0         tzdb_0.3.0          httpuv_1.6.5       
+[82] cellranger_1.1.0    gtable_0.3.0        assertthat_0.2.1   
+[85] datawizard_0.4.0    xfun_0.30           broom_0.7.12       
+[88] later_1.3.0         survival_3.2-13     cluster_2.1.2      
+[91] workflowr_1.7.0     ellipsis_0.3.2     </code></pre>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
