@@ -1,5 +1,3 @@
 # freezing_tardigrades
 
-A [workflowr][] project.
-
-[workflowr]: https://github.com/workflowr/workflowr
+[Freezing tradigrades ananlysis]: https://tardipede.github.io/freezing_cycles/
