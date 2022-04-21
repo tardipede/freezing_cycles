@@ -1,0 +1,13 @@
+---
+title: "Freezing tolerance in tardigrades"
+site: workflowr::wflow_site
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+### [0. Data](0.data.html)
+### [1. Freezing cycles tolerance estimation](1.freezing_cycles_tolerance.html)
+### [2. Freezing cycles tolerance vs. long term freezing](2.long_freezing_vs_cycles.html)

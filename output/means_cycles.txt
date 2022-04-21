@@ -1,0 +1,13 @@
+"species_code" "species" "M"
+"1" "Ap" "Adropion_Finland" 1.56197408620552
+"2" "Dp" "Dactylobiotus_parthenogeneticus" 0.519714207184047
+"3" "Hi" "Hypsibius_Italy" 8.7911024040945
+"4" "Hj" "Hypsibius_Japan" 4.34982341243327
+"5" "hk" "Cryobiotus_klebelsbergi" 13.7464414541899
+"6" "Ma" "Macrobiotus_annewintersae" 0.62103627541856
+"7" "Mr" "Macrobiotus_ripperi" 5.66314511480865
+"8" "Pf" "Paramacrobiotus_fairbanksi" 1.59044981068747
+"9" "Pr" "Paramacrobiotus_richtersi" 2.34200916352093
+"10" "Rc" "Richtersius_Italy" 9.35786517339665
+"11" "Rr" "Ramazzottius_Italy" 29.7291315405535
+"12" "Rs" "Ramazzottius_Finland" 5.4514370010699

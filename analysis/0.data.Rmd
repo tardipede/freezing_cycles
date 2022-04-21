@@ -1,0 +1,62 @@
+---
+title: "0. Data"
+author: "Matteo Vecchi"
+date: "`r Sys.Date()`"
+editor_options:
+  chunk_output_type: console
+output: 
+  workflowr::wflow_html:
+    code_folding: hide 
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#
+```{r packages, message = FALSE}
+library(tidyverse)
+library(dplyr)
+library(readxl)  # To read from excel files
+library(xfun)    # Download file from html report
+```
+
+This document describes the data analysis and plotting 
+
+## Freezing experimental data
+
+The original data file is `data_freezing.xlsx` and can be downloaded from here:
+```{r echo=FALSE}
+embed_file('./data/data_freezing.xlsx')
+```
+.  
+  
+The excel spreadsheet contains 4 sheets:
+
+* They are:
+  + **data_cycles**:  Experimental data on repeated daily freezing cycles survival. The columns are:
+    + *ID*: the individual tardigrades ID.
+    + *0* to *7*: each freezing-thaw cycle (1 = alive / 0 = dead).
+    + *species_code*: species code.
+    + *unfrozen*: if in any of the freezing cycles the water in the well didn´t froze when placed at -7C.
+    + *when*: for unfrozen = 1, at which cycle the water didn´t freeze.
+  + **data_longterm**:  Experimental data on one long term (one month) freezing survival.The columns are:
+    + *species_code*: species code.
+    + *survival*: number of animals alive after 1 month of freezing.
+    + *total*: total number of animals used in the experiment.
+  + **species_data**:  Data on the species/populations used in the experiments, including environmental data from their sampling sites. The columns are:
+    + *species_code*: species code.
+    + *Lat* and *Lon*: origin coordinates of the used populations.
+    + *Origin*: origin of the used populations.
+    + *others*: **OTHERS TO UDATE!!!!**
+  + **species_abbrev**:  Species abbreviations used in the other sheets. The columns are:
+    + *species_code*: species code.
+    + *species*: species name.
+    
+## Phylogenetic tree
+A phylogenetic tree of the used species has been obtained with MrBayes with the concatenated alignment of the markers 18S, 28S and *COI*.  
+The tree can be downloaded here: 
+```{r echo=FALSE}
+embed_file('./data/tree.nex')
+```

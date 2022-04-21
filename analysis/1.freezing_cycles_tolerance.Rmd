@@ -1,0 +1,284 @@
+---
+title: "1. Freezing cycles tolerance"
+author: "Matteo Vecchi"
+date: "`r Sys.Date()`"
+editor_options:
+  chunk_output_type: console
+output: 
+  workflowr::wflow_html:
+    code_folding: hide 
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraryes, message = FALSE}
+library(tidyverse)
+library(dplyr)
+library(readxl)  # To read from excel files
+library(R2jags)
+library(ggplot2)
+library(patchwork)
+library(DT)
+library(xfun)          # Download file from html report
+library(ape)
+library(phytools)
+library(svglite)
+library(Hmisc)
+library(ggtree)
+```
+
+# 1. Freezing-thaw cycles
+## the Model
+In this part we are going to estimate the number of cycles needed for each species to kill 50% of the individuals. To do so we are gonna fit the
+cumulative function of a discrete Weibull distribution, and then estimate its x value (# of cycles) at y = 0.5 (half of animals dead).
+The function we are gonna use to estimate the probability of an individual be dead at each cycle is:  
+
+$$  p = 1- e^{-(\frac{t+1}{\alpha})^\beta} $$
+We are however, more interested to the number of cycles needed to kill 50% of individuals (*M*). *M* will be calculated from the  $\alpha$ and $\beta$ parameters as follows:
+$$ M = \alpha * (-log(0.5)^\frac{1}{\beta})-1$$
+Based on these two equations, we reparametrize the cumulative discrete Weibull distribution to predict the alive individuals (instead than the dead ones in its origigan formulation) and to use *M* instead than $\alpha$. This reparametrization has two advantages: **1)** we can easily constrain with priors *M* to be positive (it makes biologically sense as there cannot be a negative number of freezing cycles) ad **2)** we will obtain as output of the models *M* directly without the need of processing the posteriors too much.
+The reparametrized function used in the model will be:
+$$  p = e^{-(\frac{(t+1)*(-log(0.5)^\frac{1}{\beta})}{1 + M})^\beta} $$
+
+The two parameters to be estimated will be $\alpha$ and $\beta$, whereas *p* will be fitted for each animal at each cycle trough a Bernoulli distribution as follows:  
+$$  alive \ animals \sim DBernoulli(p) $$
+
+
+## Dataset subsetting
+We are going to estimate $\alpha$ and $\beta$ with a Bayesian approach using the software JAGS trough the R package "R2jags".  
+
+* As in some data points the well didn´t freeze during the permanence at -7C, we are going to test the model on 3 different version of the dataset to test if those points are problematic and should be excluded from analysis or if they don´t change the result:
+  + Dataset **da1**: the original dataset with all the points.
+  + Dataset **da2**: only the datapoints (individual * cycle) when a well didn´t freeze are excluded.
+  + Dataset **da3**: all individuals that didn´t freeze at least once are excluded.
+
+
+```{r, message = FALSE}
+# Load the data
+data_cycles = read_xlsx("./data/data_freezing.xlsx", sheet = "data_cycles")
+species_abbrev = read_xlsx("./data/data_freezing.xlsx", sheet = "species_abbrev")
+
+# Subset the data
+da1 = data_cycles %>% gather("cycle","alive",2:9)
+da2 = data_cycles %>% gather("cycle","alive",2:9) %>% subset(when != cycle)
+da3 = data_cycles %>% gather("cycle","alive",2:9) %>% subset(unfrozen == 0)
+```
+
+The first dataset (da1) has `r nrow(da1)` data points, the second (da2) has `r nrow(da2)`, whereas da3 has `r nrow(da3)` data points, so even with the harshest data subsetting (da3) we don´t loose many data points.
+
+
+## JAGS data
+We prepare the three data objects for JAGS, each for every susbet version of the dataset.
+
+```{r, message = FALSE}
+data.jags.da1 = list(alive = as.integer(da1$alive),                        # if an animal was alive
+                 cycle = as.integer(da1$cycle),                            # cycle number
+                 species_num = as.numeric(as.factor(da1$species_code)),    # what species is that animal
+                 Nsp = length(unique(da1$species_code)))                   # number of species (to allow the model to loop trought species)
+
+data.jags.da2 = list(alive = as.integer(da2$alive),
+                 cycle = as.integer(da2$cycle),
+                 species_num = as.numeric(as.factor(da2$species_code)),
+                 Nsp = length(unique(da2$species_code)))
+
+data.jags.da3 = list(alive = as.integer(da3$alive),
+                 cycle = as.integer(da3$cycle),
+                 species_num = as.numeric(as.factor(da3$species_code)),
+                 Nsp = length(unique(da3$species_code)))
+```
+
+
+## JAGS model
+The model function for JAGS is the same for the three dataset, so their resuts will be directly comparable.
+
+```{r, message = FALSE}
+model.jags.da = function(){
+  
+  # Priors
+  for (sp in 1:Nsp) {        # we estimate M and beta separately for each species
+    beta[sp] ~ dexp(0.1)     # very low informative prior bound to be >0
+    M[sp] ~ dexp(0.1)        # very low informative prior bound to be >0
+  }
+
+  
+  # Likelihood
+  for (i in 1:length(alive)){
+
+    
+    numerator[i] <- (cycle[i]+1)*((-log(0.5))^(1/beta[species_num[i]]))
+    p_alive[i] <- exp(-((numerator[i]/(1+M[species_num[i]]))^(beta[species_num[i]])))
+    
+    p_regularized[i] <- ifelse(p_alive[i] == 0, 0.00001, ifelse(p_alive[i] == 1, 0.99999, p_alive[i])) # This is to avoid the model to crash when p is exactly 0 or 1
+    
+    alive[i] ~ dbern(p_regularized[i])
+    
+  }
+  
+}
+```
+
+## Run the JAGS models
+
+As the models takes long time to run, the results are saved as RDS files. If the models has been already run in the working directory,
+instead of rerun them, they will be loaded from memory.
+
+```{r echo=T, results='hide'}
+
+# Model da1
+ifelse("mod.da1.rds" %in% list.files("./output"),{mod.da1 = readRDS("./output/mod.da1.rds")},{
+
+  mod.da1 = jags(data = data.jags.da1, parameters.to.save =  c("M"), model.file = model.jags.da, n.iter = 10000)
+write_rds(mod.da1, file="./output/mod.da1.rds")
+  
+})
+
+
+# Model da2
+ifelse("mod.da2.rds" %in% list.files("./output"),{mod.da2 = readRDS("./output/mod.da2.rds")},{
+
+  mod.da2 = jags(data = data.jags.da2, parameters.to.save =  c("alpha","beta"), model.file = model.jags, n.iter = 1000000)
+write_rds(mod.da2, file="./output/mod.da2.rds")
+  
+})
+
+
+# Model da3
+ifelse("mod.da3.rds" %in% list.files("./output"),{mod.da3 = readRDS("./output/mod.da3.rds")},{
+
+  mod.da3 = jags(data = data.jags.da3, parameters.to.save =  c("alpha","beta"), model.file = model.jags, n.iter = 1000000)
+write_rds(mod.da3, file="./output/mod.da3.rds")
+  
+})
+
+```
+
+## Plot the models estimates
+
+We are now going to plot side by side the *M* estimated for each model (divided by species) to check if different data subsetting strategies to deal with the issue of some wells not freezing affect the *M* estimates.  
+
+```{r echo=T, fig.height = 10, fig.width = 10}
+# First we create a table to code back the species numebrs used in the models to their species names
+lev_to_num = data.frame(number = 1:length(levels(as.factor(data_cycles$species_code))), 
+                        species_code =  levels(as.factor(data_cycles$species_code))) %>% merge(species_abbrev)
+
+# We then create a function to extract the species number from the variable names in the model outputs
+extract.number = function(x){as.numeric(gsub(".*?([0-9]+).*", "\\1", x))}
+  
+# Now we extract the chains and do some cleaning of the data to have them ready for plotting
+chains.da1 = data.frame(do.call(rbind, as.mcmc(mod.da1))) %>% dplyr::select(!deviance) %>% gather("species_var","M") %>%
+  mutate(number = extract.number(species_var), model = rep("da1",nrow(.))) %>% merge(lev_to_num)
+
+chains.da2 = data.frame(do.call(rbind, as.mcmc(mod.da2))) %>% dplyr::select(!deviance) %>% gather("species_var","M") %>%
+  mutate(number = extract.number(species_var), model = rep("da2",nrow(.))) %>% merge(lev_to_num)
+
+chains.da3 = data.frame(do.call(rbind, as.mcmc(mod.da3))) %>% dplyr::select(!deviance) %>% gather("species_var","M") %>%
+  mutate(number = extract.number(species_var), model = rep("da3",nrow(.))) %>% merge(lev_to_num)
+
+chains_all = rbind(chains.da1, chains.da2,chains.da3)
+
+# Plotting
+ggplot(chains_all)+
+  theme_bw()+
+  geom_violin(aes(x=model, y=M, fill=model), alpha = 0.50, scale = "width", col = NA, show.legend = F)+
+  facet_wrap(.~species, scales="free_y")+
+  stat_summary(aes(x=model, y=M, group=model),fun=median, colour="black", geom="point", size = 3)+
+  stat_summary(aes(x=model, y=M, group=model),fun.data=median_hilow, colour="black", geom="linerange")+
+  expand_limits(y=0) + ylab("# of cycles to death of 50% of individuals") + xlab("Model")
+```
+
+For almost all species the estimated of the different models are almost identical. Only form *Marobiotus ripperi* and *Macrobiotus annewintersae* they look different in the model **da3**, howevere they still overlap with the estimated of **da1** and **da2** that look very similar to each other. Given the small influence of the data points where the well didn't freeze, we will continue the analysis by keeping the most complete model, aka **da1**.  
+
+Now we can calculate the mean estimates of the number of cycles to death of 50% of individuals for each species
+```{r echo=T}
+means_cycles = aggregate(chains.da1$M, by=list(chains.da1$species_code), FUN=mean)
+colnames(means_cycles) = c("species_code", "M")
+means_cycles = merge(species_abbrev, means_cycles)
+means_cycles[,2:3]
+write.table(means_cycles, "./output/means_cycles.txt")
+```
+
+## Plot the estimates against phylogeny
+
+```{r echo=T, message = FALSE, warning = FALSE}
+chains_toplot = chains.da1[,c(6,3)]
+
+# load the tree
+tree = chronos(read.nexus("./data/tree.nex"))
+tree = drop.tip(tree, tip = tree$tip.label[!(tree$tip.label %in% unique(chains_toplot$species))])
+class(tree) = "phylo"
+
+
+#this part gets the order of the tip labels as plotted in ggtree
+d = fortify(tree)
+d = subset(d, isTip)
+tips.order = rev(with(d, label[order(y, decreasing=T)]))
+
+#reorder the species
+chains_toplot = chains_toplot[chains_toplot$species %in% tips.order,]
+chains_toplot$species = factor(chains_toplot$species, levels = tips.order)
+
+
+#make the plot
+treeplot = ggtree(tree,size=1) + # plot tree topology
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.title=element_blank(),
+        axis.text=element_blank(),
+        axis.ticks=element_blank(),panel.border = element_blank())
+
+T50plot = ggplot(chains_toplot)+
+  theme_bw()+
+  geom_violin(aes(x=species, y=M+1), alpha=0.5, scale="width", show.legend=T, color="NA", fill="lightblue")+
+  #scale_fill_viridis_c()+
+  scale_y_continuous(trans="log2",breaks = c(1,2,6,11,21,41,81), labels =c(0,1,5,10,20,40,80))+
+  scale_fill_gradient2(high="#FF6699", mid="#CC99FF", low="#3399FF", na.value = "grey50",midpoint=0)+
+  stat_summary(aes(x=species, y=M+1),fun=median, colour="black", geom="point", size = 3)+
+  stat_summary(aes(x=species, y=M+1),fun.data=median_hilow, colour="black", geom="linerange")+
+  xlab("")+ylab("")+coord_flip()+
+  scale_x_discrete(position = "top")+
+  theme(panel.grid.major.y = element_blank(), panel.grid.minor = element_blank(),panel.border =    element_blank())
+
+
+(treeplot|T50plot) +  plot_layout(widths = c(1,2))
+ggsave("./output/tree_Cycles.svg")
+
+```
+
+Download the plot in svg format
+```{r echo=FALSE}
+embed_file('./output/tree_Cycles.svg')
+```
+
+## Phylogenetic signal tests
+We can test the estimated resistance to repeated freezing cycles (as # of cycles to death of 50% of individuals) for phylogenetic signal.  
+
+```{r phylogenetic signal}
+# We already have the mean estimates for the # of cycles, however we can calculate their se to improve the phylogenetic signal estimation
+se_cycles = aggregate(chains.da1$M, by=list(chains.da1$species_code), FUN=function(x) sqrt(var(x) / length(x)))
+colnames(se_cycles) = c("species_code", "M")
+se_cycles = merge(species_abbrev, se_cycles)
+
+# Transform them to vectors for the phylosig function
+M_mean = means_cycles$M
+names(M_mean) = means_cycles$species
+
+M_se = se_cycles$M
+names(M_se) = se_cycles$species
+
+# Keep only taxa present both in tree and data vectors
+M_mean = M_mean[names(M_mean) %in% tree$tip.label]
+M_se = M_se[names(M_se) %in% tree$tip.label]
+
+K_phylosig = phylosig(tree, M_mean , method="K", test=TRUE, se = M_se)
+lambda_phylosig = phylosig(tree, M_mean , method="lambda", test=TRUE, se = M_se)
+
+
+K_phylosig
+lambda_phylosig
+```
+
+
