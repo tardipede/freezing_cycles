@@ -1,3 +1,4 @@
 # freezing_tardigrades
 
-[Freezing tradigrades ananlysis]: https://tardipede.github.io/freezing_cycles/
+Check the analysis workflow here:
+[Freezing tradigrades ananlysis](https://tardipede.github.io/freezing_cycles/)
