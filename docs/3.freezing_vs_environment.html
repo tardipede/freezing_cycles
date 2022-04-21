@@ -551,15 +551,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestree3526b930fdaecd58660aa6294121e141f7be1c67targetblank3526b93a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestree01c007616d909c80d0fd6dcddba053f6a1c28e37targetblank01c0076a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/tardipede/freezing_cycles/tree/3526b930fdaecd58660aa6294121e141f7be1c67" target="_blank">3526b93</a>
+<a href="https://github.com/tardipede/freezing_cycles/tree/01c007616d909c80d0fd6dcddba053f6a1c28e37" target="_blank">01c0076</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestree3526b930fdaecd58660aa6294121e141f7be1c67targetblank3526b93a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestree01c007616d909c80d0fd6dcddba053f6a1c28e37targetblank01c0076a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -569,7 +569,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/tardipede/freezing_cycles/tree/3526b930fdaecd58660aa6294121e141f7be1c67" target="_blank">3526b93</a>.
+<a href="https://github.com/tardipede/freezing_cycles/tree/01c007616d909c80d0fd6dcddba053f6a1c28e37" target="_blank">01c0076</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -585,11 +585,6 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rproj.user/
-
-Untracked files:
-    Untracked:  .gitignore
-    Untracked:  output/M_vs_plong_plot.svg
-    Untracked:  output/tree_Cycles.svg
 
 </code></pre>
 <p>
@@ -692,6 +687,43 @@ sPC2 = as.matrix(scale(bioclims_extracted)) %*% as.matrix(simplified_loadings_PC
 plot(pca_bioclims$x[,1],sPC1, xlab=&quot;sPC1&quot;, ylab=&quot;PC1&quot;)
 abline(lm(sPC1~pca_bioclims$x[,1]))</code></pre>
 <p><img src="figure/3.freezing_vs_environment.Rmd/simplify%20PCA-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-simplify-PCA-1">
+Past versions of "simplify PCA-1.png"
+</button>
+</p>
+<div id="fig-no-spaces-simplify-PCA-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tardipede/freezing_cycles/blob/df35b0982e0c97383319aba519f3e2e0e7746a17/docs/figure/3.freezing_vs_environment.Rmd/simplify PCA-1.png" target="_blank">df35b09</a>
+</td>
+<td>
+Matteo Vecchi
+</td>
+<td>
+2022-04-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>cor.test(sPC1,pca_bioclims$x[,1]) </code></pre>
 <pre><code>
     Pearson&#39;s product-moment correlation
@@ -708,6 +740,43 @@ sample estimates:
 plot(pca_bioclims$x[,2],sPC2, xlab=&quot;sPC2&quot;, ylab=&quot;PC2&quot;)
 abline(lm(sPC2~pca_bioclims$x[,2]))</code></pre>
 <p><img src="figure/3.freezing_vs_environment.Rmd/simplify%20PCA-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-simplify-PCA-2">
+Past versions of "simplify PCA-2.png"
+</button>
+</p>
+<div id="fig-no-spaces-simplify-PCA-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tardipede/freezing_cycles/blob/df35b0982e0c97383319aba519f3e2e0e7746a17/docs/figure/3.freezing_vs_environment.Rmd/simplify PCA-2.png" target="_blank">df35b09</a>
+</td>
+<td>
+Matteo Vecchi
+</td>
+<td>
+2022-04-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>cor.test(sPC2,pca_bioclims$x[,2])</code></pre>
 <pre><code>
     Pearson&#39;s product-moment correlation
@@ -852,6 +921,43 @@ plot3 = ggplot(sloadings)+
 
 plot1|(plot2/plot3)</code></pre>
 <p><img src="figure/3.freezing_vs_environment.Rmd/plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot-1">
+Past versions of plot-1.png
+</button>
+</p>
+<div id="fig-plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tardipede/freezing_cycles/blob/df35b0982e0c97383319aba519f3e2e0e7746a17/docs/figure/3.freezing_vs_environment.Rmd/plot-1.png" target="_blank">df35b09</a>
+</td>
+<td>
+Matteo Vecchi
+</td>
+<td>
+2022-04-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div id="refs">
 
 </div>
@@ -905,18 +1011,18 @@ loaded via a namespace (and not attached):
 [49] magrittr_2.0.3      Formula_1.2-4       Matrix_1.4-0       
 [52] Rcpp_1.0.8.3        munsell_0.5.0       fansi_1.0.3        
 [55] abind_1.4-5         lifecycle_1.0.1     terra_1.5-21       
-[58] stringi_1.7.6       yaml_2.3.5          grid_4.1.3         
-[61] parallel_4.1.3      promises_1.2.0.1    crayon_1.5.1       
-[64] lattice_0.20-45     splines_4.1.3       haven_2.4.3        
-[67] hms_1.1.1           knitr_1.38          pillar_1.7.0       
-[70] boot_1.3-28         codetools_0.2-18    reprex_2.0.1       
-[73] glue_1.6.2          evaluate_0.15       latticeExtra_0.6-29
-[76] data.table_1.14.2   modelr_0.1.8        png_0.1-7          
-[79] vctrs_0.4.0         tzdb_0.3.0          httpuv_1.6.5       
-[82] cellranger_1.1.0    gtable_0.3.0        assertthat_0.2.1   
-[85] datawizard_0.4.0    xfun_0.30           broom_0.7.12       
-[88] later_1.3.0         survival_3.2-13     cluster_2.1.2      
-[91] workflowr_1.7.0     ellipsis_0.3.2     </code></pre>
+[58] stringi_1.7.6       whisker_0.4         yaml_2.3.5         
+[61] grid_4.1.3          parallel_4.1.3      promises_1.2.0.1   
+[64] crayon_1.5.1        lattice_0.20-45     splines_4.1.3      
+[67] haven_2.4.3         hms_1.1.1           knitr_1.38         
+[70] pillar_1.7.0        boot_1.3-28         codetools_0.2-18   
+[73] reprex_2.0.1        glue_1.6.2          evaluate_0.15      
+[76] latticeExtra_0.6-29 data.table_1.14.2   modelr_0.1.8       
+[79] png_0.1-7           vctrs_0.4.0         tzdb_0.3.0         
+[82] httpuv_1.6.5        cellranger_1.1.0    gtable_0.3.0       
+[85] assertthat_0.2.1    datawizard_0.4.0    xfun_0.30          
+[88] broom_0.7.12        later_1.3.0         survival_3.2-13    
+[91] cluster_2.1.2       workflowr_1.7.0     ellipsis_0.3.2     </code></pre>
 </div>
 
 
