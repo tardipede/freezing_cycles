@@ -11,7 +11,7 @@
 
 <meta name="author" content="Matteo Vecchi" />
 
-<meta name="date" content="2022-04-21" />
+<meta name="date" content="2022-04-22" />
 
 <title>1. Freezing cycles tolerance</title>
 
@@ -390,7 +390,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">1. Freezing cycles tolerance</h1>
 <h4 class="author">Matteo Vecchi</h4>
-<h4 class="date">2022-04-21</h4>
+<h4 class="date">2022-04-22</h4>
 
 </div>
 
@@ -398,7 +398,7 @@ div.tocify {
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -409,8 +409,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -419,13 +419,13 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2022-04-21
+<strong>Last updated:</strong> 2022-04-22
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>freezing_cycles/</code> <span
@@ -448,18 +448,21 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
@@ -550,15 +553,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestree01c007616d909c80d0fd6dcddba053f6a1c28e37targetblank01c0076a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestreeb49a35edf1644ee0849d2ca8e56c56081611e5c3targetblankb49a35ea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/tardipede/freezing_cycles/tree/01c007616d909c80d0fd6dcddba053f6a1c28e37" target="_blank">01c0076</a>
+<a href="https://github.com/tardipede/freezing_cycles/tree/b49a35edf1644ee0849d2ca8e56c56081611e5c3" target="_blank">b49a35e</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestree01c007616d909c80d0fd6dcddba053f6a1c28e37targetblank01c0076a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestreeb49a35edf1644ee0849d2ca8e56c56081611e5c3targetblankb49a35ea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -568,7 +571,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/tardipede/freezing_cycles/tree/01c007616d909c80d0fd6dcddba053f6a1c28e37" target="_blank">01c0076</a>.
+<a href="https://github.com/tardipede/freezing_cycles/tree/b49a35edf1644ee0849d2ca8e56c56081611e5c3" target="_blank">b49a35e</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -584,6 +587,10 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rproj.user/
+
+Unstaged changes:
+    Modified:   analysis/1.freezing_cycles_tolerance.Rmd
+    Modified:   analysis/2.long_freezing_vs_cycles.Rmd
 
 </code></pre>
 <p>
@@ -870,17 +877,8 @@ means_cycles[,2:3]</code></pre>
 <pre class="r"><code>chains_toplot = chains.da1[,c(6,3)]
 
 # load the tree
-tree = chronos(read.nexus(&quot;./data/tree.nex&quot;))</code></pre>
-<pre><code>
-Setting initial dates...
-Fitting in progress... get a first set of estimates
-         (Penalised) log-lik = -25.15977 
-Optimising rates... dates... -25.15977 
-Optimising rates... dates... -25.15977 
-
-log-Lik = -24.98872 
-PHIIC = 108.23 </code></pre>
-<pre class="r"><code>tree = drop.tip(tree, tip = tree$tip.label[!(tree$tip.label %in% unique(chains_toplot$species))])
+tree = chronos(read.nexus(&quot;./data/tree.nex&quot;))
+tree = drop.tip(tree, tip = tree$tip.label[!(tree$tip.label %in% unique(chains_toplot$species))])
 class(tree) = &quot;phylo&quot;
 
 
@@ -996,6 +994,9 @@ logL(lambda) : -38.625
 MLE(sig2) : 69.8283 
 LR(lambda=0) : 0.225559 
 P-value (based on LR test) : 0.634836 </code></pre>
+<p>It seems there is no phylogenetic signal in the resistance to
+freeze-thaw cycles, however the sample is low (11 species), so those
+results should be taken cautiously.</p>
 <div id="refs">
 
 </div>

@@ -202,7 +202,7 @@ write.table(means_cycles, "./output/means_cycles.txt")
 
 ## Plot the estimates against phylogeny
 
-```{r echo=T, message = FALSE, warning = FALSE}
+```{r echo=T, message = FALSE, warning = FALSE, results='hide',fig.keep='all'}
 chains_toplot = chains.da1[,c(6,3)]
 
 # load the tree
@@ -281,4 +281,4 @@ K_phylosig
 lambda_phylosig
 ```
 
-
+It seems there is no phylogenetic signal in the resistance to freeze-thaw cycles, however the sample is low (11 species), so those results should be taken cautiously.

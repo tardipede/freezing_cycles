@@ -31,26 +31,27 @@ library(svglite)
 We will test if there is a relationship between the resistence to freeze-thaw cycles and the resistence to long term freezing. Due to the low number of species tested, and the presence of a phylogenetic structure in both variables, we will use the simplest possible way that is testing the relationship between Phylogenetic Indipendent Contrasts (PIC).  
 
 ## Data preparation
-
-```{r echo=T}
+```{r echo=T, results='hide', warning=FALSE,message=FALSE,error=FALSE}
+# Read the data on long-term freezing sirvival and merge it in a single table with the estimated number of cycles to death of 50% of individuals for each tested species.
 data_comparison_freezing = read_xlsx("./data/data_freezing.xlsx", sheet = "data_longterm") %>% mutate(p_long = as.numeric(survival)/as.numeric(total)) %>% merge(read.table("./output/means_cycles.txt", header=T)) %>% column_to_rownames(var = "species_code") %>% filter(complete.cases(.))
 rownames(data_comparison_freezing) = data_comparison_freezing$species
 ```
 
-We need now to load the phylogenetic tree.
-```{r echo=T, message = FALSE, warning = FALSE}
+## Phylogenetic tree loading and ultrametrization
+```{r echo=T, message = FALSE, warning = FALSE, results='hide'}
+# Load the species phylogenetic tree and ultrametricize it. As we are using the tree only to control for phylogeny, we don't need to get very fancy with ultrametrization and we can simply ise the "chronos" function.
 tree = chronos(read.nexus("./data/tree.nex"))
 
-# As not all species were used for the long term freezing, we have to drop the unused ones from the phylogenetic tree
+# To avoid issues downstream, we crosscheck that all the tree tips are represented in the data table and viceversa
 tree = drop.tip(tree, tip = tree$tip.label[!(tree$tip.label %in% rownames(data_comparison_freezing))])
 
 data_comparison_freezing = data_comparison_freezing[rownames(data_comparison_freezing) %in% tree$tip.label,]
 
 ```
 
-Plot the phylogenetic trees with mapped the two characters face to face.
-
-```{r echo=T}
+## Ancestral state reconstruction of freezing tolerance
+```{r echo=T, results='hide'}
+# We use the "contMap" function from "phytools" to reconstruct the ancestral state.
 vect.M = data_comparison_freezing$M
 names(vect.M) = rownames(data_comparison_freezing)
 objM = contMap(tree,vect.M,plot=FALSE, method="anc.ML", lims = c(0,30))
@@ -59,7 +60,10 @@ vect.p = data_comparison_freezing$p_long
 names(vect.p) = rownames(data_comparison_freezing)
 objp = contMap(tree,vect.p,plot=FALSE, method="anc.ML", lims = c(0,1))
 
+```
 
+## Ancestral state plotting
+```{r,results='hide',fig.keep='all'}
 par(mfrow=c(1,2))
 plot(objM,lwd=7,ftype="reg",xlim=c(-0.2,1.2),legend=0.5, fsize=0.75)
 plot(objp,lwd=7,direction="leftwards",ftype="off",xlim=c(-0.2,1.2),
@@ -78,7 +82,7 @@ Download the plot in svg format
 embed_file('./output/M_vs_plong_plot.svg')
 ```
 
-
+## Correlation between long-term and repeated freezing
 Test the correlation (corrected by phylogeny) between freeze-thaw cycles tolerance and long term freezing tolerance
 ```{r echo=T}
 mat.chars = data_comparison_freezing[,c(3,5)] %>% drop_na() %>% mutate(p_long = scale(p_long), M = scale(M)) %>% as.matrix()
@@ -93,6 +97,7 @@ plot(M_pic ~ plong_pic, pch=19,
             ylab="Freeze-thaw resistance PIC")
 
 a_pic = anova(lm_pic)
+a_pic
 ``` 
 
-The p-value of the correlation between tolerance to freeze-thaw cycles and long term survival (accounting for shared evolutionary history) is `r round(a_pic[[5]][1],3)`.
+The p-value of the correlation between tolerance to freeze-thaw cycles and long term survival (accounting for shared evolutionary history) is `r round(a_pic[[5]][1],3)`. This would suggest that there is no correlation between the two types of freezing resistances, however the sample size is very low (9 species,8 PIC) and by checking the scatterplot above it seems that only one point is responsible for this lack of correlation, so this result should be taken with extreme cation.
