@@ -399,7 +399,7 @@ cycles</h1>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+workflowr <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -410,8 +410,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> </a>
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -424,9 +424,9 @@ aria-hidden="true"></span> </a>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 1
+aria-hidden="true"></span> 0
 </p>
 <p>
 <strong>Knit directory:</strong> <code>freezing_cycles/</code> <span
@@ -449,21 +449,18 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
-<span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
-changes </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguncommittedchanges"
+<div id="strongRMarkdownfilestronguptodate"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
-<code>wflow_publish</code> to commit the R Markdown file and build the
-HTML.</p>
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
 </div>
 </div>
 </div>
@@ -554,15 +551,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestreeb49a35edf1644ee0849d2ca8e56c56081611e5c3targetblankb49a35ea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestreecdacac46875fdfd74851d778af0494834acd9f0ftargetblankcdacac4a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/tardipede/freezing_cycles/tree/b49a35edf1644ee0849d2ca8e56c56081611e5c3" target="_blank">b49a35e</a>
+<a href="https://github.com/tardipede/freezing_cycles/tree/cdacac46875fdfd74851d778af0494834acd9f0f" target="_blank">cdacac4</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestreeb49a35edf1644ee0849d2ca8e56c56081611e5c3targetblankb49a35ea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestreecdacac46875fdfd74851d778af0494834acd9f0ftargetblankcdacac4a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -572,7 +569,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/tardipede/freezing_cycles/tree/b49a35edf1644ee0849d2ca8e56c56081611e5c3" target="_blank">b49a35e</a>.
+<a href="https://github.com/tardipede/freezing_cycles/tree/cdacac46875fdfd74851d778af0494834acd9f0f" target="_blank">cdacac4</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -587,10 +584,8 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
+    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-
-Unstaged changes:
-    Modified:   analysis/2.long_freezing_vs_cycles.Rmd
 
 </code></pre>
 <p>
@@ -666,6 +661,43 @@ plot(objM,lwd=7,ftype=&quot;reg&quot;,xlim=c(-0.2,1.2),legend=0.5, fsize=0.75)
 plot(objp,lwd=7,direction=&quot;leftwards&quot;,ftype=&quot;off&quot;,xlim=c(-0.2,1.2),
     legend=0.5)</code></pre>
 <p><img src="figure/2.long_freezing_vs_cycles.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tardipede/freezing_cycles/blob/cdacac46875fdfd74851d778af0494834acd9f0f/docs/figure/2.long_freezing_vs_cycles.Rmd/unnamed-chunk-4-1.png" target="_blank">cdacac4</a>
+</td>
+<td>
+Matteo Vecchi
+</td>
+<td>
+2022-04-22
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>svglite(&quot;./output/M_vs_plong_plot.svg&quot;, width = 6, height = 6) # save the plot
 par(mfrow=c(1,2))
 plot(objM,lwd=7,ftype=&quot;reg&quot;,xlim=c(-0.2,1.2),legend=0.5)
@@ -691,6 +723,43 @@ plot(M_pic ~ plong_pic, pch=19,
      xlab=&quot;Long term freezing resistance PIC&quot;,
             ylab=&quot;Freeze-thaw resistance PIC&quot;)</code></pre>
 <p><img src="figure/2.long_freezing_vs_cycles.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/tardipede/freezing_cycles/blob/cdacac46875fdfd74851d778af0494834acd9f0f/docs/figure/2.long_freezing_vs_cycles.Rmd/unnamed-chunk-6-1.png" target="_blank">cdacac4</a>
+</td>
+<td>
+Matteo Vecchi
+</td>
+<td>
+2022-04-22
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>a_pic = anova(lm_pic)
 a_pic</code></pre>
 <pre><code>Analysis of Variance Table
@@ -756,18 +825,19 @@ loaded via a namespace (and not attached):
 [40] jquerylib_0.1.4         generics_0.1.2          combinat_0.0-8         
 [43] jsonlite_1.8.0          magrittr_2.0.3          Matrix_1.4-0           
 [46] Rcpp_1.0.8.3            munsell_0.5.0           fansi_1.0.3            
-[49] abind_1.4-5             lifecycle_1.0.1         scatterplot3d_0.3-41   
-[52] stringi_1.7.6           yaml_2.3.5              clusterGeneration_1.3.7
-[55] MASS_7.3-55             grid_4.1.3              parallel_4.1.3         
-[58] promises_1.2.0.1        crayon_1.5.1            lattice_0.20-45        
-[61] haven_2.4.3             hms_1.1.1               tmvnsim_1.0-2          
-[64] knitr_1.38              pillar_1.7.0            igraph_1.3.0           
-[67] boot_1.3-28             codetools_0.2-18        fastmatch_1.1-3        
-[70] reprex_2.0.1            glue_1.6.2              evaluate_0.15          
-[73] modelr_0.1.8            vctrs_0.4.0             tzdb_0.3.0             
-[76] httpuv_1.6.5            cellranger_1.1.0        gtable_0.3.0           
-[79] assertthat_0.2.1        mime_0.12               broom_0.7.12           
-[82] later_1.3.0             workflowr_1.7.0         ellipsis_0.3.2         </code></pre>
+[49] abind_1.4-5             lifecycle_1.0.1         whisker_0.4            
+[52] scatterplot3d_0.3-41    stringi_1.7.6           yaml_2.3.5             
+[55] clusterGeneration_1.3.7 MASS_7.3-55             grid_4.1.3             
+[58] parallel_4.1.3          promises_1.2.0.1        crayon_1.5.1           
+[61] lattice_0.20-45         haven_2.4.3             hms_1.1.1              
+[64] tmvnsim_1.0-2           knitr_1.38              pillar_1.7.0           
+[67] igraph_1.3.0            boot_1.3-28             codetools_0.2-18       
+[70] fastmatch_1.1-3         reprex_2.0.1            glue_1.6.2             
+[73] evaluate_0.15           modelr_0.1.8            vctrs_0.4.0            
+[76] tzdb_0.3.0              httpuv_1.6.5            cellranger_1.1.0       
+[79] gtable_0.3.0            assertthat_0.2.1        mime_0.12              
+[82] broom_0.7.12            later_1.3.0             workflowr_1.7.0        
+[85] ellipsis_0.3.2         </code></pre>
 </div>
 </div>
 
