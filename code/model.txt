@@ -2,8 +2,7 @@
 model {
     # PRIORS
     alpha ~ dunif(-100, 100)
-    beta_spc1 ~ dunif(-100, 100)
-    beta_spc2 ~ dunif(-100, 100)
+    beta ~ dunif(-100, 100)
     sigma.phylo ~ dnorm(0,100)T(0,)
     tau.phylo <- 1/(sigma.phylo^2)
     sigma.res ~ dnorm(0,100)T(0,)
@@ -14,8 +13,7 @@ model {
 
     for(i in 1:nsp){
         mu.M[i] <- alpha +
-          beta_spc1 * sPC1[i] +
-          beta_spc2 * sPC2[i] +
+          beta * mixprop[i] +
           error.phylo[i]
         M[i] ~ dnorm(mu.M[i], tau.res)
     }

@@ -16,10 +16,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r libraries, include=FALSE}
 library(tidyverse)
-library(raster)
 library(readxl)
 library(dplyr)
 library(rgdal)
+library(raster)
 library(ape)
 library(bayestestR)
 library(R2jags)
@@ -34,121 +34,66 @@ library(xfun)
 points = data.frame(read_xlsx("./data/data_freezing.xlsx", sheet = "species_data"))[,1:3]
 ```
 
-## Get bioclim data for species sampling locations
-```{r get bioclim}
-# The 30' resolution BIoclims rasters are heavy, so I load the point data extracted previously.
-#If you want to do it by yourself put the bioclim rasters 1:11 in a folder in the data folder and run the following code
-#bioclim_stack = stack(list.files("./data/bioclim/", full.names = TRUE))
-#bioclims_extracted = data.frame(raster::extract(bioclim_stack, points[,3:2]))
 
-bioclims_extracted = read.table("./data/bioclim_data.txt", header=T)
+
+## Get climatic data for species sampling locations
+
+```{r, eval = FALSE}
+# This script extracts how many months have the minimum temperature below zero and the maximum temperature above zero (from Bioclim rasters) and save it in a table. 
+# As the raw climatic rasters are very heavy (~ 10Gb), this code is not run, but only shown here.
+# The tmin and tmax data rasters can be downloaded at: https://www.worldclim.org/data/monthlywth.html
+
+
+tmin.list = list.files(path="./data/tmin", 
+                           pattern =".tif", full.names=TRUE)
+tmin.stack = raster::stack(x=tmin.list)
+tmins = data.frame(raster::extract(tmin.stack, points[,3:2]))
+tmins = cbind(points$species_code, tmins)
+tmins = gather(tmins, "month", "temp_min", 2:ncol(tmins))
+colnames(tmins)[1] ="species"
+tmins$month = substr(tmins$month,start=17, stop = 23)
+
+
+tmax.list = list.files(path="./data/tmax", 
+                       pattern =".tif", full.names=TRUE)
+tmax.stack = raster::stack(tmax.list)
+tmax = data.frame(raster::extract(tmax.stack, points[,3:2]))
+tmax = cbind(points$species_code, tmax)
+tmax = gather(tmax, "month", "temp_max", 2:ncol(tmax))
+colnames(tmax)[1] ="species"
+tmax$month = substr(tmax$month,start=17, stop = 23)
+
+
+temp_all = distinct(merge(tmins, tmax, by=c("species","month"))) 
+
+
+  low = (temp_all$temp_min<0) * (temp_all$temp_max<0) # not really necessary
+  mixed = (temp_all$temp_min<0) * (temp_all$temp_max>0)
+  high = (temp_all$temp_min>0) * (temp_all$temp_max>0)
+
+month_class = rep("low", nrow(temp_all))
+month_class[as.logical(mixed)] = "mixed"
+month_class[as.logical(high)] = "high"
+  
+temp_all$month_class = month_class
+
+sum_table = data.frame(table(temp_all$species, temp_all$month_class))
+colnames(sum_table) = c("species_code", "type", "count")
+sum_table = sum_table %>% filter(type == "mixed") %>% mutate(prop_mixed = count/108)
+
+write.table(sum_table, "./data/mixedmonths_data.txt")
+
+```
+
+
+```{r load proportion of mixed months}
+bioclims_extracted = read.table("./data/mixedmonths_data.txt", header=T)
 
 ```
 
-## Run PCA on Bioclidata and calculate simplfied Principal Components
-See @Bjorklund2019 for more information on simplified Principal Components (sPCs)
-```{r simplify PCA}
-pca_bioclims = prcomp(bioclims_extracted, scale=T)
-
-# function to permute the dataset
-data_permute = function(x){
-  for (i in 1:ncol(x)){
-    x[,i]=base::sample(x[,i],size=length(x[,i]),replace=F)}
-  return(x)
-}
-
-# Create a set of 1000 null  PCAs
-pca_nulls = list()
-for (i in 1:1000){
-  pca_nulls[[i]] = prcomp(data_permute(bioclims_extracted),scale.=T,center=T)
-}
-
-
-# Get null distribution of explained variance
-eig_nulls = lapply(pca_nulls, function(x){(x$sdev)^2/sum((x$sdev)^2)})
-eig_nulls = data.frame(do.call(rbind,eig_nulls))
-colnames(eig_nulls) = c("PC1","PC2","PC3","PC4")
-# Explained variance on observed data
-eig_obs = (pca_bioclims$sdev)^2/sum((pca_bioclims$sdev)^2)
-
-# Calculate explained variance p-values
-eig_pvals = c()
-for (i in 1:length(eig_obs)){
-  eig_pvals[i] = mean(eig_obs[i] < eig_nulls[,i])
-}
-names(eig_pvals) = paste0("PC",1:11)
-# Given the p-values, we will retain only the first 2 PCs
-
-# Create a function to calculate the ILs of the components loadings
-IL = function(x, component){
-  eig = (x$sdev^2)[component]
-  ILs = (x$rotation[,component]^2)*eig^2 
-  return(ILs)
-}
-
-# PC1
-IL_observed_PC1 = IL(pca_bioclims,1)
-IL_nulls_PC1 = data.frame(do.call(rbind,lapply(pca_nulls,IL, component=1)))
-
-# Calculate PC1 IL p-values
-IL_PC1_pvals = c()
-for (i in 1:length(IL_observed_PC1)){
-  IL_PC1_pvals[i] = mean(IL_observed_PC1[i] < IL_nulls_PC1[,i])
-}
-names(IL_PC1_pvals) = colnames(IL_nulls_PC1) 
-
-# PC2
-IL_observed_PC2 = IL(pca_bioclims,2)
-IL_nulls_PC2 = data.frame(do.call(rbind,lapply(pca_nulls,IL, component=2)))
-
-# Calculate PC2 IL p-values
-IL_PC2_pvals = c()
-for (i in 1:length(IL_observed_PC2)){
-  IL_PC2_pvals[i] = mean(IL_observed_PC2[i] < IL_nulls_PC2[,i])
-}
-names(IL_PC2_pvals) = colnames(IL_nulls_PC2) 
-
-
-# Create a simplified PC1 (sPC1)
-simplified_loadings_PC1 = pca_bioclims$rotation[,1] * (IL_PC1_pvals<0.05)
-sPC1 = as.matrix(scale(bioclims_extracted)) %*% as.matrix(simplified_loadings_PC1)
-
-# Create a simplified PC2 (sPC2)
-simplified_loadings_PC2 = pca_bioclims$rotation[,2] * (IL_PC2_pvals<0.05)
-sPC2 = as.matrix(scale(bioclims_extracted)) %*% as.matrix(simplified_loadings_PC2)
-
-# test if PC1 and sPC1 are correlated
-cor.PC1 = cor.test(sPC1,pca_bioclims$x[,1]) 
-
-# test if PC2 and sPC2 are correlated
-cor.PC2 =cor.test(sPC2,pca_bioclims$x[,2])
-
-#Calculate the new eigenvalue for sPC
-tot.var = sum(pca_bioclims$sdev^2)
-sPC1var = var(sPC1)
-sPC1.expvar = sPC1var/tot.var
-
-#Calculate the new eigenvalue for sPC2
-sPC2var = var(sPC2)
-sPC2.expvar = sPC2var/tot.var
-
-# Create new PCs data frame
-sPCs = data.frame(species_code = points$species_code,
-                  sPC1 = sPC1,
-                  sPC2 = sPC2)
-
-# create loadings dataframe
-sloadings = data.frame(bioclim  = names(simplified_loadings_PC1),
-                       sPC1 = simplified_loadings_PC1,
-                       sPC2 = simplified_loadings_PC2)
-
-
-```
-The correlation between PC1 and sPC1 is `r round(cor.PC1$estimate,3)`, whereas the correlation between PC2 and sPC2 is `r round(cor.PC2$estimate,3)`, so we can safely use the simplified PCs instead of the original ones.  
-
-## Merge sPCA data with freezing cycles tolerance data
+## Merge climatic data with freezing cycles tolerance data
 ```{r merge environmental data with freezing tolerance data}
-data_merged = merge(read.table("./output/means_cycles.txt", header=T),sPCs)
+data_merged = merge(read.table("./output/means_cycles.txt", header=T),bioclims_extracted)
 data_merged$scaled_M = as.numeric(scale(data_merged$M))
 ```
 
@@ -170,15 +115,14 @@ inv.phylo.matrix = solve(phylo.matrix)
 data_merged = data_merged[match(rownames(inv.phylo.matrix),data_merged$species),]
 
 data.jags = list(M = data_merged$scaled_M,
-                 sPC1 = as.numeric(scale(data_merged$sPC1)),
-                 sPC2 = as.numeric(scale(data_merged$sPC2)),
+                 mixprop = as.numeric(scale(data_merged$prop_mixed)),
                  inv.phylo.matix = inv.phylo.matrix,
                  nsp = nrow(inv.phylo.matrix),
                  zeros = rep(0, nrow(inv.phylo.matrix)))
 
 # The model includes some truncated priors. As it is not possible to do it by specifying the modell as function in R, the moded is loaded as txt file.
 
-parameters.jags = c("alpha","beta_spc1","beta_spc2","sigma.phylo","sigma.res")
+parameters.jags = c("alpha","beta","sigma.phylo","sigma.res")
 
 
 ifelse("mod.env.rds" %in% list.files("./output"),{fit.env = readRDS("./output/mod.env.rds")},{
@@ -212,75 +156,12 @@ chains = data.frame(do.call(rbind,as.mcmc(fit.env)))
 
 p_dir = p_direction(chains)
 p_vals = pd_to_p(p_dir$pd)
+p_vals[3:5] = rep(NA,3)
 names(p_vals) = p_dir$Parameter
 
 fit.env$BUGSoutput$summary %>% cbind(p_vals) %>% round(4) %>%datatable(class = 'cell-border stripe')
 
 ```
 
-## Plot beta estimates and sPCAs loadings for final figure
-```{r plot, results='hide',fig.keep='all'}
-chains_to_plot = gather(chains[,c(2:3)],"variable","value")
-chains_to_plot$variable = factor(chains_to_plot$variable, levels = c("beta_spc2","beta_spc1"))
+The beta paramenter represent the effect of the proportion on "mixed" months on the resistance to freeze-thaw cycles. It is positive and significant, so the more the mixed months there are, the more the tardigrades are resistent.  
 
-medians = aggregate(chains_to_plot$value, by=list(chains_to_plot$variable), FUN = median)
-
-plot1 = ggplot(chains_to_plot )+
-  theme_bw()+
-  geom_hline(yintercept = 0, col="red")+
-  geom_violin(aes(x=variable, y=value), alpha=0.5, show.legend=T, color="NA", fill="lightblue")+
-  #scale_fill_viridis_c()+
-  stat_summary(aes(x=variable, y=value),fun=median, colour="black", geom="point", size = 3)+
-  stat_summary(aes(x=variable, y=value),fun.data=median_hilow, colour="black", geom="linerange")+
-  geom_text(data= medians,aes(x=(1:2)+0.1, y=medians[,2], label = paste0("p = ",round(p_vals[3:2],4))))+
-  xlab("")+ylab("")+coord_flip()+
-  theme(panel.grid.major.y = element_blank(), panel.grid.minor = element_blank(),panel.border =    element_blank())+
-  scale_x_discrete(labels = c("sPC2","sPC1"))+ 
-  ggtitle("Effect of sPCs on \nfreezing-thawing resistance")
-
-
-
-plot2 = ggplot(sloadings)+
-        theme_bw()+
-         geom_hline(yintercept = 0, col="black")+
-        geom_bar(stat="identity", aes(x=bioclim, y=sPC1))+
-  xlab("")+ylab("Contribution to sPC1")+
-  theme(panel.grid.major.y = element_blank(), panel.grid.minor = element_blank(),panel.border =    element_blank(), axis.text.x = element_text(angle = 90))+
-  scale_x_discrete(label = paste0("BIO",1:11))
-
-plot3 = ggplot(sloadings)+
-        theme_bw()+
-        geom_hline(yintercept = 0, col="black")+
-        geom_bar(stat="identity", aes(x=bioclim, y=sPC2))+
-  xlab("")+ylab("Contribution to sPC2")+
-  theme(panel.grid.major.y = element_blank(), panel.grid.minor = element_blank(),panel.border =    element_blank(), axis.text.x = element_text(angle = 90))+
-  scale_x_discrete(label = paste0("BIO",1:11))
-
-plot1|(plot2/plot3)
-ggsave("./output/plot_mod_fitenv.pdf")
-```
-Download plot in pdf here:
-```{r echo=FALSE}
-embed_file('./output/plot_mod_fitenv.pdf')
-```
-
-The sPC1 has not a significant effect on the number of freeze-thawing cycles to death of 50% of individuals (p = `r round(p_vals[2],4)`), whereas sPC2 has an effect (p = `r round(p_vals[3],4)`).  
-The contributors of sPC2 are **BIO6**, **BIO9** and **BIO10**, and they all contribute positively to it, whereas the coefficent for the effect of sPC2 is negative, so those three variables have a negative effect on the freezing cycles tolerance.  It should be noted that it is not possible to distinguish between the effect of the single BIOclim variables, as in our data they are correlated.  As general result, the tolerance to freezing cycles is negatively impacted by the minimum temperature of the coldest month, by the mean temperatures of the driest and of the warmest quarters.  
-
-
-## Bioclim description
-**BIO1** = Annual Mean Temperature  
-**BIO2** = Mean Diurnal Range (Mean of monthly (max temp - min temp))  
-**BIO3** = Isothermality (BIO2/BIO7) (×100)  
-**BIO4** = Temperature Seasonality (standard deviation ×100)  
-**BIO5** = Max Temperature of Warmest Month  
-**BIO6** = Min Temperature of Coldest Month  
-**BIO7** = Temperature Annual Range (BIO5-BIO6)  
-**BIO8** = Mean Temperature of Wettest Quarter  
-**BIO9** = Mean Temperature of Driest Quarter  
-**BIO10** = Mean Temperature of Warmest Quarter  
-**BIO11** = Mean Temperature of Coldest Quarter  
-
-## References
-
-<div id="refs"></div>
