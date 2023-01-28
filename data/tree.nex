@@ -1,4 +1,0 @@
-#NEXUS
-begin trees;
-	tree tree_1 = [&R] (((Ramazzottius_Italy:3.505662,Ramazzottius_Finland:1.150047):1.680753,(Adropion_Finland:2.849199,(Cryobiotus_klebelsbergi:2.413347,Hypsibius_Italy:1.168744):2.043344):2.675842):0.65788,((((Macrobiotus_annewintersae:1.203666,Macrobiotus_ripperi:1.522507):3.860129,(Paramacrobiotus_richtersi:0.573079,Paramacrobiotus_fairbanksi:0.249875):2.888017):0.642369,Dactylobiotus_parthenogeneticus:2.431727):0.086133,Richtersius_Italy:2.042948):0.65788);
-end;

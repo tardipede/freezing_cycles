@@ -1,13 +1,13 @@
-"species_code" "species" "M"
-"1" "Ap" "Adropion_Finland" 1.56197408620552
-"2" "Dp" "Dactylobiotus_parthenogeneticus" 0.519714207184047
-"3" "Hi" "Hypsibius_Italy" 8.7911024040945
-"4" "Hj" "Hypsibius_Japan" 4.34982341243327
-"5" "hk" "Cryobiotus_klebelsbergi" 13.7464414541899
-"6" "Ma" "Macrobiotus_annewintersae" 0.62103627541856
-"7" "Mr" "Macrobiotus_ripperi" 5.66314511480865
-"8" "Pf" "Paramacrobiotus_fairbanksi" 1.59044981068747
-"9" "Pr" "Paramacrobiotus_richtersi" 2.34200916352093
-"10" "Rc" "Richtersius_Italy" 9.35786517339665
-"11" "Rr" "Ramazzottius_Italy" 29.7291315405535
-"12" "Rs" "Ramazzottius_Finland" 5.4514370010699
+"species_code" "species" "M" "low95" "high95"
+"1" "Ap" "Adropion_scoticum" 1.56197408620552 1.32480989568789 1.78720086717827
+"2" "Dp" "Dactylobiotus_parthenogeneticus" 0.519714207184047 0.171287849288759 0.83171434161123
+"3" "Hi" "Hypsibius_Italy" 8.7911024040945 6.89811005339926 12.2176230023157
+"4" "Hj" "Hypsibius_Japan" 4.34982341243327 3.56064024644352 5.35895812118092
+"5" "hk" "Cryobiotus_klebelsbergi" 13.7464414541899 9.31539401378893 23.0414069509761
+"6" "Ma" "Macrobiotus_annewintersae" 0.62103627541856 0.264338502390088 0.971092874798302
+"7" "Mr" "Macrobiotus_ripperi" 5.66314511480865 5.22492382628457 6.17647196198393
+"8" "Pf" "Paramacrobiotus_fairbanksi" 1.59044981068747 1.34392254208709 1.82669565563155
+"9" "Pr" "Paramacrobiotus_richtersi" 2.34200916352093 1.92732491342212 2.74809607226177
+"10" "Rc" "Richtersius_Italy" 9.35786517339665 7.21817330429807 13.4528368391928
+"11" "Rr" "Ramazzottius_Italy" 29.7291315405535 14.99476102688 59.5875491288113
+"12" "Rs" "Ramazzottius_Finland" 5.4514370010699 4.26082111900855 7.43196529442862

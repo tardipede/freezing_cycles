@@ -14,7 +14,7 @@ bibliography: bibliography.bib
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r libraryes, message = FALSE}
+```{r libraryes, message = FALSE, warning=FALSE}
 library(tidyverse)
 library(dplyr)
 library(readxl)  # To read from excel files
@@ -193,21 +193,25 @@ For almost all species the estimated of the different models are almost identica
 
 Now we can calculate the mean estimates of the number of cycles to death of 50% of individuals for each species
 ```{r echo=T}
-means_cycles = aggregate(chains.da1$M, by=list(chains.da1$species_code), FUN=mean)
-colnames(means_cycles) = c("species_code", "M")
+means_cycles = aggregate(chains.da1$M, by=list(chains.da1$species_code), 
+                         FUN=function(x){c(mean(x),quantile(x,probs = c(0.025, 0.975)))})
+means_cycles = data.frame(means_cycles$Group.1,means_cycles$x)
+colnames(means_cycles) = c("species_code", "M","low95","high95")
 means_cycles = merge(species_abbrev, means_cycles)
-means_cycles[,2:3]
+means_cycles[,2:5]
 write.table(means_cycles, "./output/means_cycles.txt")
 ```
 
 ## Plot the estimates against phylogeny
 
 ```{r echo=T, message = FALSE, warning = FALSE, results='hide',fig.keep='all'}
-chains_toplot = chains.da1[,c(6,3)]
+chains_toplot = chains.da1[,c(3,6)]
 
 # load the tree
-tree = chronos(read.nexus("./data/tree.nex"))
-tree = drop.tip(tree, tip = tree$tip.label[!(tree$tip.label %in% unique(chains_toplot$species))])
+tree = read.tree("./data/tree.nwk")
+tree = root(tree,"Milnesium_variefidum")
+tree = chronos(tree)
+tree = drop.tip(tree, tip = tree$tip.label[!(tree$tip.label %in% unique(chains.da1$species))])
 class(tree) = "phylo"
 
 
@@ -234,7 +238,9 @@ T50plot = ggplot(chains_toplot)+
   theme_bw()+
   geom_violin(aes(x=species, y=M+1), alpha=0.5, scale="width", show.legend=T, color="NA", fill="lightblue")+
   #scale_fill_viridis_c()+
-  scale_y_continuous(trans="log2",breaks = c(1,2,6,11,21,41,81), labels =c(0,1,5,10,20,40,80))+
+  scale_y_continuous(trans="log",breaks = c(1,2,6,11,21,41,81), labels =c(0,1,5,10,20,40,80))+
+  #scale_y_continuous(trans="sqrt",breaks = seq(0,80,5), labels = seq(0,80,5))+
+  #scale_y_continuous(trans="log2",breaks = seq(0,80,5)+1, labels =seq(0,80,5))+
   scale_fill_gradient2(high="#FF6699", mid="#CC99FF", low="#3399FF", na.value = "grey50",midpoint=0)+
   stat_summary(aes(x=species, y=M+1),fun=median, colour="black", geom="point", size = 3)+
   stat_summary(aes(x=species, y=M+1),fun.data=median_hilow, colour="black", geom="linerange")+
@@ -244,13 +250,13 @@ T50plot = ggplot(chains_toplot)+
 
 
 (treeplot|T50plot) +  plot_layout(widths = c(1,2))
-ggsave("./output/tree_Cycles.svg")
+ggsave("./output/tree_Cycles.pdf")
 
 ```
 
-Download the plot in svg format
+Download the plot in pdf format
 ```{r echo=FALSE}
-embed_file('./output/tree_Cycles.svg')
+embed_file('./output/tree_Cycles.pdf')
 ```
 
 ## Phylogenetic signal tests
@@ -281,4 +287,4 @@ K_phylosig
 lambda_phylosig
 ```
 
-It seems there is no phylogenetic signal in the resistance to freeze-thaw cycles, however the sample is low (11 species), so those results should be taken cautiously.
+It seems there is no phylogenetic signal (Bloombers´s K) in the resistance to freeze-thaw cycles, however the sample is low (12 species), so those results should be taken cautiously.

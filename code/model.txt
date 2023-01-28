@@ -15,7 +15,28 @@ model {
         mu.M[i] <- alpha +
           beta * mixprop[i] +
           error.phylo[i]
+
+          # This calculates the predicted y without random effect to then calculate R2
+        yPredFixed[i] <- alpha +
+          beta * mixprop[i]
+
         M[i] ~ dnorm(mu.M[i], tau.res)
+
+
     }
+
+    varFixed <- (sd(yPredFixed))^2
+    varResidual <-  sigma.res^2
+    varRandom <- sigma.phylo^2
+
+    # calculate marginal R^2
+  marginalR2 <- varFixed / (varFixed + varRandom + varResidual)
+  # calculate conditional R^2
+  conditionalR2 <- (varRandom + varFixed) / (varFixed + varRandom + varResidual)
+  # calculate residual r^2
+   residualR2 <- 1-conditionalR2
+  # calculate phylogenetic effect R2
+   phylogeneticR2 <- conditionalR2 - marginalR2
+
 
 } # end model

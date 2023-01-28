@@ -13,7 +13,7 @@
 
 <title>Freezing tolerance in tardigrades</title>
 
-<script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -151,11 +151,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -184,8 +188,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -193,16 +197,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -284,7 +281,7 @@ $(document).ready(function () {
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -295,8 +292,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -305,13 +302,13 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2022-04-29
+<strong>Last updated:</strong> 2022-12-28
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>freezing_cycles/</code> <span
@@ -334,33 +331,36 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestree06cc95cc4ed5ecd72bf618df9d1cf37788fb53e8targetblank06cc95ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestreeed0e131c61ed3fc3047fbbda1f91121d328aaabatargetblanked0e131a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/tardipede/freezing_cycles/tree/06cc95cc4ed5ecd72bf618df9d1cf37788fb53e8" target="_blank">06cc95c</a>
+<a href="https://github.com/tardipede/freezing_cycles/tree/ed0e131c61ed3fc3047fbbda1f91121d328aaaba" target="_blank">ed0e131</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestree06cc95cc4ed5ecd72bf618df9d1cf37788fb53e8targetblank06cc95ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomtardipedefreezingcyclestreeed0e131c61ed3fc3047fbbda1f91121d328aaabatargetblanked0e131a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -370,7 +370,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/tardipede/freezing_cycles/tree/06cc95cc4ed5ecd72bf618df9d1cf37788fb53e8" target="_blank">06cc95c</a>.
+<a href="https://github.com/tardipede/freezing_cycles/tree/ed0e131c61ed3fc3047fbbda1f91121d328aaaba" target="_blank">ed0e131</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -385,10 +385,33 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
+    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/site_libs/
+
+Untracked files:
+    Untracked:  analysis/2.freezing_vs_environment.Rmd
+    Untracked:  data/tree.nwk
 
 Unstaged changes:
+    Deleted:    .DS_Store
+    Modified:   analysis/0.data.Rmd
+    Modified:   analysis/1.freezing_cycles_tolerance.Rmd
+    Deleted:    analysis/2.long_freezing_vs_cycles.Rmd
+    Deleted:    analysis/3.freezing_vs_environment.Rmd
+    Modified:   analysis/index.Rmd
+    Modified:   code/model.txt
+    Deleted:    data/.DS_Store
+    Modified:   data/data_freezing.xlsx
+    Modified:   data/mixedmonths_data.txt
+    Deleted:    data/tree.nex
+    Modified:   freezing_tardigrades.Rproj
+    Deleted:    output/M_vs_plong_plot.svg
+    Modified:   output/means_cycles.txt
+    Modified:   output/mod.env.rds
     Modified:   output/model_fit.env.pdf
+    Deleted:    output/plot_mod_fitenv.pdf
+    Deleted:    output/tree_Cycles.svg
 
 </code></pre>
 <p>
@@ -418,13 +441,8 @@ There are no past versions. Publish this analysis with
 <h3><a href="1.freezing_cycles_tolerance.html">1. Freezing cycles
 tolerance estimation</a></h3>
 </div>
-<div id="freezing-cycles-tolerance-vs.-long-term-freezing"
-class="section level3">
-<h3><a href="2.long_freezing_vs_cycles.html">2. Freezing cycles
-tolerance vs. long term freezing</a></h3>
-</div>
 <div id="freezing-vs.-environmental-variables" class="section level3">
-<h3><a href="3.freezing_vs_environment.html">3. Freezing
+<h3><a href="2.freezing_vs_environment.html">2. Freezing
 vs. environmental variables</a></h3>
 </div>
 
